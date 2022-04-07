@@ -14,7 +14,7 @@ function First_Level () {
             . c 5 1 d d c . 
             . . f d d f . . 
             . . . f f . . . 
-            `, SpriteKind.Player)
+            `, SpriteKind.Food)
         tiles.placeOnTile(Gold, value)
         tiles.setTileAt(value, assets.tile`transparency16`)
     }
