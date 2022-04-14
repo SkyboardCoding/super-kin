@@ -1,9 +1,77 @@
+namespace SpriteKind {
+    export const Coin = SpriteKind.create()
+    export const KindofFlower = SpriteKind.create()
+}
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile0`, function (sprite, location) {
+    Level += 1
+    First_Level()
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Coin, function (sprite, otherSprite) {
+    info.changeScoreBy(1)
+    otherSprite.destroy()
+})
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (Kin.vy == 0) {
+        Kin.vy = -150
+    }
+})
+scene.onOverlapTile(SpriteKind.Player, assets.tile`myTile4`, function (sprite, location) {
+    game.over(false, effects.melt)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.KindofFlower, function (sprite, otherSprite) {
+    otherSprite.destroy()
+    Ghost = sprites.create(img`
+        ........................
+        ........................
+        ........................
+        ..........ffff..........
+        ........ff1111ff........
+        .......fb111111bf.......
+        .......f1111111dbf......
+        ......fd1111111ddf......
+        ......fd111111dddf......
+        ......fd111ddddddf......
+        ......fd111ddddddf......
+        ......fd1dddddddbf......
+        ......fd1dfbddbbff......
+        ......fbddfcdbbcf.......
+        .....ffffccddbfff.......
+        ....fcb1bbbfcffff.......
+        ....f1b1dcffffffff......
+        ....fdfdf..ffffffffff...
+        .....f.f.....ffffff.....
+        ........................
+        ........................
+        ........................
+        ........................
+        ........................
+        `, SpriteKind.Enemy)
+    Ghost.setPosition(Kin.x + 80, Kin.y - 80)
+    Ghost.follow(sprite, 50)
+})
 function First_Level () {
     if (Level == 1) {
         tiles.setCurrentTilemap(tilemap`level1`)
+    } else if (Level == 2) {
+        tiles.setCurrentTilemap(tilemap`level4`)
+    } else {
+        game.over(true, effects.confetti)
     }
     tiles.placeOnRandomTile(Kin, assets.tile`myTile2`)
     scene.cameraFollowSprite(Kin)
+    info.setLife(5)
+    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
+        value.destroy()
+    }
+    for (let value of sprites.allOfKind(SpriteKind.Coin)) {
+        value.destroy()
+    }
+    for (let value of sprites.allOfKind(SpriteKind.KindofFlower)) {
+        value.destroy()
+    }
+    for (let value of tiles.getTilesByType(assets.tile`myTile2`)) {
+        tiles.setTileAt(value, assets.tile`transparency16`)
+    }
     for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
         Gold = sprites.create(img`
             . . . b b . . . 
@@ -14,14 +82,43 @@ function First_Level () {
             . c 5 1 d d c . 
             . . f d d f . . 
             . . . f f . . . 
-            `, SpriteKind.Food)
+            `, SpriteKind.Coin)
         tiles.placeOnTile(Gold, value)
         tiles.setTileAt(value, assets.tile`transparency16`)
     }
+    for (let value of tiles.getTilesByType(assets.tile`myTile5`)) {
+        Flower = sprites.create(img`
+            . . . . . . . . 
+            . . . . . . . . 
+            . . . . . . . . 
+            . . . . . . . . 
+            . b b d d b b . 
+            b 1 1 3 3 1 1 b 
+            b 1 3 5 5 3 1 b 
+            b d 3 5 5 3 d b 
+            c 1 1 d d 1 1 c 
+            c d 1 d d 1 d c 
+            . c c 7 6 c c . 
+            . . 6 7 6 . . . 
+            . . 6 6 8 8 8 6 
+            . . 6 8 7 7 7 6 
+            . . 8 7 7 7 6 . 
+            . . 8 8 8 6 . . 
+            `, SpriteKind.KindofFlower)
+        tiles.placeOnTile(Flower, value)
+        tiles.setTileAt(value, assets.tile`transparency16`)
+    }
 }
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    info.changeLifeBy(-1)
+    otherSprite.destroy()
+})
+let Flower: Sprite = null
 let Gold: Sprite = null
+let Ghost: Sprite = null
 let Level = 0
 let Kin: Sprite = null
+info.setScore(0)
 scene.setBackgroundColor(9)
 scene.setBackgroundImage(img`
     9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
